@@ -26,15 +26,16 @@ import com.google.jetstream.presentation.screens.videoPlayer.VideoPlayerScreen
 enum class Screens(
     private val args: List<String>? = null,
     val isTabItem: Boolean = false,
-    val tabIcon: ImageVector? = null
+    val tabIcon: ImageVector? = null,
+    val displayName: String? = null
 ) {
     Profile,
-    Home(isTabItem = true),
-    Categories(isTabItem = true),
-    Movies(isTabItem = true),
-    Shows(isTabItem = true),
-    Favourites(isTabItem = true),
-    Search(isTabItem = true, tabIcon = Icons.Default.Search),
+    Home(isTabItem = true, displayName = "Kezdőlap"),
+    Categories(isTabItem = true, displayName = "Református"),
+    Movies(isTabItem = true, displayName = "Katolikus"),
+    Shows(isTabItem = true, displayName = "Evangélikus"),
+    Favourites,
+    Search(tabIcon = Icons.Default.Search),
     CategoryMovieList(listOf(CategoryMovieListScreen.CategoryIdBundleKey)),
     MovieDetails(listOf(MovieDetailsScreen.MovieIdBundleKey)),
     Dashboard,

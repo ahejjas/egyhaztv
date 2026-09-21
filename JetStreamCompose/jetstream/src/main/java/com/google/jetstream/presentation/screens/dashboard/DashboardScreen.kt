@@ -56,15 +56,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.jetstream.data.entities.ChurchCategory
 import com.google.jetstream.data.entities.Movie
 import com.google.jetstream.presentation.screens.Screens
-import com.google.jetstream.presentation.screens.categories.CategoriesScreen
+import com.google.jetstream.presentation.screens.church.ChurchScreen
 import com.google.jetstream.presentation.screens.favourites.FavouritesScreen
 import com.google.jetstream.presentation.screens.home.HomeScreen
-import com.google.jetstream.presentation.screens.movies.MoviesScreen
 import com.google.jetstream.presentation.screens.profile.ProfileScreen
 import com.google.jetstream.presentation.screens.search.SearchScreen
-import com.google.jetstream.presentation.screens.shows.ShowsScreen
 import com.google.jetstream.presentation.utils.Padding
 
 val ParentPadding = PaddingValues(vertical = 16.dp, horizontal = 58.dp)
@@ -117,27 +116,27 @@ fun DashboardScreen(
     }
 
     BackPressHandledArea(
-        // 1. On user's first back press, bring focus to the current selected tab, if TopBar is not
-        //    visible, first make it visible, then focus the selected tab
-        // 2. On second back press, bring focus back to the first displayed tab
-        // 3. On third back press, exit the app
         onBackPressed = {
             if (!isTopBarVisible) {
                 isTopBarVisible = true
                 TopBarFocusRequesters[currentTopBarSelectedTabIndex + 1].requestFocus()
-            } else if (currentTopBarSelectedTabIndex == 0) onBackPressed()
-            else if (!isTopBarFocused) {
+            } else if (currentTopBarSelectedTabIndex == 0) {
+                onBackPressed()
+            } else if (!isTopBarFocused) {
                 TopBarFocusRequesters[currentTopBarSelectedTabIndex + 1].requestFocus()
-            } else TopBarFocusRequesters[1].requestFocus()
+            } else {
+                TopBarFocusRequesters[1].requestFocus()
+            }
         }
     ) {
-        // We do not want to focus the TopBar everytime we come back from another screen e.g.
-        // MovieDetails, CategoryMovieList or VideoPlayer screen
-        var wasTopBarFocusRequestedBefore by rememberSaveable { mutableStateOf(false) }
+        var wasTopBarFocusRequestedBefore by rememberSaveable {
+            mutableStateOf(false)
+        }
 
-        var topBarHeightPx: Int by rememberSaveable { mutableIntStateOf(0) }
+        var topBarHeightPx: Int by rememberSaveable {
+            mutableIntStateOf(0)
+        }
 
-        // Used to show/hide DashboardTopBar
         val topBarYOffsetPx by animateIntAsState(
             targetValue = if (isTopBarVisible) 0 else -topBarHeightPx,
             animationSpec = tween(),
@@ -150,9 +149,12 @@ fun DashboardScreen(
             }
         )
 
-        // Used to push down/pull up NavHost when DashboardTopBar is shown/hidden
         val navHostTopPaddingDp by animateDpAsState(
-            targetValue = if (isTopBarVisible) with(density) { topBarHeightPx.toDp() } else 0.dp,
+            targetValue = if (isTopBarVisible) {
+                with(density) { topBarHeightPx.toDp() }
+            } else {
+                0.dp
+            },
             animationSpec = tween(),
             label = "",
         )
@@ -183,7 +185,9 @@ fun DashboardScreen(
             val targetRoute = screen()
             if (currentDestination != targetRoute) {
                 navController.navigate(targetRoute) {
-                    if (screen == TopBarTabs[0]) popUpTo(TopBarTabs[0].invoke())
+                    if (screen == TopBarTabs[0]) {
+                        popUpTo(TopBarTabs[0].invoke())
+                    }
                     launchSingleTop = true
                 }
             }
@@ -239,6 +243,7 @@ private fun Body(
         composable(Screens.Profile()) {
             ProfileScreen()
         }
+
         composable(Screens.Home()) {
             HomeScreen(
                 onMovieClick = { selectedMovie ->
@@ -249,26 +254,25 @@ private fun Body(
                 isTopBarVisible = isTopBarVisible
             )
         }
+
         composable(Screens.Categories()) {
-            CategoriesScreen(
-                onCategoryClick = openCategoryMovieList,
-                onScroll = updateTopBarVisibility
+            ChurchScreen(
+                category = ChurchCategory.REFORMATUS
             )
         }
+
         composable(Screens.Movies()) {
-            MoviesScreen(
-                onMovieClick = { movie -> openMovieDetailsScreen(movie.id) },
-                onScroll = updateTopBarVisibility,
-                isTopBarVisible = isTopBarVisible
+            ChurchScreen(
+                category = ChurchCategory.KATOLIKUS
             )
         }
+
         composable(Screens.Shows()) {
-            ShowsScreen(
-                onTVShowClick = { movie -> openMovieDetailsScreen(movie.id) },
-                onScroll = updateTopBarVisibility,
-                isTopBarVisible = isTopBarVisible
+            ChurchScreen(
+                category = ChurchCategory.EVANGELIKUS
             )
         }
+
         composable(Screens.Favourites()) {
             FavouritesScreen(
                 onMovieClick = openMovieDetailsScreen,
@@ -276,9 +280,12 @@ private fun Body(
                 isTopBarVisible = isTopBarVisible
             )
         }
+
         composable(Screens.Search()) {
             SearchScreen(
-                onMovieClick = { movie -> openMovieDetailsScreen(movie.id) },
+                onMovieClick = { movie ->
+                    openMovieDetailsScreen(movie.id)
+                },
                 onScroll = updateTopBarVisibility
             )
         }

@@ -147,7 +147,7 @@ fun DashboardTopBar(
                                         modifier = Modifier
                                             .occupyScreenSize()
                                             .padding(horizontal = 16.dp),
-                                        text = screen(),
+                                        text = screen.displayName ?: screen(),
                                         style = MaterialTheme.typography.titleSmall.copy(
                                             color = LocalContentColor.current
                                         )
